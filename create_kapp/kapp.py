@@ -1,11 +1,12 @@
 # region Create-kApp
-from typing import Literal, Callable
-import sys
-import os
-import requests
-import zipfile
 import io
+import os
+import sys
 import time
+import zipfile
+from typing import Callable, Literal
+
+import requests
 
 Completed = Literal["confirm", "input"]
 
