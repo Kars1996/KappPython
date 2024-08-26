@@ -11,6 +11,7 @@ import requests
 Completed = Literal["confirm", "input"]
 
 
+# Kprompts will be released as its own thing at a later date
 class KPrompts:
     """
     Provides simple input and confirmation prompts with custom colors.
