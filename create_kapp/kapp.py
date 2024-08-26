@@ -1,6 +1,4 @@
 # region Create-kApp
-# Python port of my npm package (old ui)
-
 from typing import Literal, Callable
 import sys
 import os
@@ -11,12 +9,15 @@ import time
 
 Completed = Literal["confirm", "input"]
 
-
-#  ! This is an old verion of kprompts, doesn't hve all the new features. Don't use this
 class KPrompts:
-    """Minified verson of my package to recreate "prompts" on Javascript"""
+    """
+    Provides simple input and confirmation prompts with custom colors.
+    
+    This is a simplified version of the 'prompts' NPM package for Python.
+    """
 
     def __init__(self) -> None:
+        """Initializes the prompt class and fixes color formatting for terminals."""
         self.fix_colors()
         self.colors = {
             "cyan": "\033[0;96m",
@@ -28,7 +29,7 @@ class KPrompts:
 
     @staticmethod
     def fix_colors() -> None:
-        """Function to fix colors in windows"""
+        """Enables colored output for Windows terminals if supported."""
         if not sys.stdout.isatty():
             for _ in dir():
                 if isinstance(_, str) and _[0] != "_":
@@ -40,26 +41,24 @@ class KPrompts:
                 del kernel32
 
     def print(self, text: str) -> None:
-        """Custom Print cause normal print is annoying (Could honestly be achived with end="" tho)"""
+        """Outputs formatted text with custom colors."""
         sys.stdout.write(f"{self.colors['white']}{text} ")
         sys.stdout.flush()
 
     def final_print(
         self, question: str, answer: str, password: bool | None = False
     ) -> None:
-        """Final message to keep it similar to the NPM package"""
+        """Prints the final message with the user's input, imitating the style of the NPM prompts package."""
         sys.stdout.write(
             f"{self.colors['green']}√{self.colors['white']} {question} {self.colors['grey']}»{self.colors['white']} {answer}\n"
         )
         sys.stdout.flush()
 
-    def better_input(
-        self,
-        text: str,
-    ) -> str:
+    def better_input(self, text: str) -> str:
+        """Displays a formatted input prompt and captures the user's input."""
         self.print(f"{self.colors['cyan']}? {self.colors['white']}{text}")
         user_input = input(f" {self.colors['grey']}»{self.colors['white']} ")
-        sys.stdout.write("\033[F\033[K")
+        sys.stdout.write("\033[F\033[K")  # Clears previous input
         return user_input
 
     def prompt(
@@ -69,7 +68,18 @@ class KPrompts:
         validate: Callable[[str], bool] | None = None,
         keep: bool | None = True,
     ) -> str:
-        """Main Code"""
+        """
+        Displays an input or confirmation prompt based on the provided option.
+        
+        Args:
+            option (Completed): The prompt type ('input' or 'confirm').
+            message (str): The prompt message.
+            validate (Callable[[str], bool], optional): A validation function for user input.
+            keep (bool, optional): If True, prints the user's answer after validation.
+
+        Returns:
+            str: The user's validated input or confirmation response.
+        """
         if option == "input":
             try:
                 while True:
@@ -93,7 +103,6 @@ class KPrompts:
                 )
 
         elif option == "confirm":
-            """Simple Confirmaton Script"""
             try:
                 while True:
                     user_input = self.better_input(
@@ -112,14 +121,21 @@ class KPrompts:
                     f"\r{self.colors['red']}× {self.colors['white']}{message} {self.colors['grey']}(y/n) {self.colors['grey']}» ...{self.colors['white']}\n"
                 )
 
-        # ! Typesafety should make sure this doesn't happen but python is goofy
         else:
             raise ValueError(f"Invalid option: {option}")
 
 
 class CreateKapp:
+    """
+    A simple CLI tool for downloading and setting up project templates from GitHub.
+    
+    Args:
+        user (str): GitHub username.
+        branch (str): Branch of the repository to download.
+    """
+
     def __init__(self, user: str, branch: str) -> None:
-        """Config Options"""
+        """Initializes the CreateKapp class with GitHub user and branch."""
         global Prompt
         self.user = user
         self.branch = branch
@@ -132,23 +148,17 @@ class CreateKapp:
         }
         Prompt = KPrompts()
 
-    """These are just simple little funny tex formatting thingies"""
-    def question(self, prompt: str) -> None:
-        return print(f"{self.colors['cyan']}?{self.colors['white']} {prompt}", end="")
-
-    def answer(self, prompt: str, recursive: bool | None = False) -> None:
-        prefix = "\r" if recursive else ""
-        print(f"{prefix}{self.colors['green']}√{self.colors['white']} {prompt}", end="")
-
-    def angry(self, prompt: str, recursive: bool | None = False) -> None:
-        prefix = "\r" if recursive else ""
-        return print(
-            f"{prefix}{self.colors['red']}×{self.colors['white']} {prompt}", end=""
-        )
-
     def set_path(self, path: str) -> str:
-        """Setsthe users path"""
-        global found_path # Honestly this could just be returned instead of being global
+        """
+        Sets the path where the project will be created.
+        
+        Args:
+            path (str): The folder path where the project will be set up.
+        
+        Returns:
+            str: The absolute path to the project folder.
+        """
+        global found_path
         if path == ".":
             found_path = os.getcwd()
             return found_path
@@ -158,7 +168,12 @@ class CreateKapp:
         return found_path
 
     def download(self, url: str) -> None:
-        """Download logic (much simpler on python ngl)"""
+        """
+        Downloads and extracts a project template from GitHub.
+        
+        Args:
+            url (str): The URL of the GitHub repository template.
+        """
         try:
             download_url = f"https://github.com/{self.user}/{url}/archive/refs/heads/{self.branch}.zip"
             Prompt.print(
@@ -177,7 +192,7 @@ class CreateKapp:
             time.sleep(2)
 
     def run(self) -> None:
-        """Main CLI bit"""
+        """Runs the CreateKapp CLI tool."""
         folder = Prompt.prompt(
             "input",
             "Setup the project in (specify folder)...?",
@@ -185,13 +200,13 @@ class CreateKapp:
         )
         self.set_path(folder)
 
-        scaffold = Prompt.prompt("input", "What scaffold do you want to start with?") # This will useoptoins once i finish it in kapp
-
+        scaffold = Prompt.prompt("input", "What scaffold do you want to start with?")
         self.download(scaffold if scaffold in self.urls else self.urls[0])
-        self.answer("Sucessfully setup project :D")
+        self.answer("Successfully set up project :D")
 
 
 def main():
+    """Entry point for the CreateKapp CLI tool."""
     try:
         app = CreateKapp(user="kars1996", branch="master")
         app.run()
