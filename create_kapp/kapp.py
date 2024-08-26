@@ -9,10 +9,11 @@ import time
 
 Completed = Literal["confirm", "input"]
 
+
 class KPrompts:
     """
     Provides simple input and confirmation prompts with custom colors.
-    
+
     This is a simplified version of the 'prompts' NPM package for Python.
     """
 
@@ -70,7 +71,7 @@ class KPrompts:
     ) -> str:
         """
         Displays an input or confirmation prompt based on the provided option.
-        
+
         Args:
             option (Completed): The prompt type ('input' or 'confirm').
             message (str): The prompt message.
@@ -128,7 +129,7 @@ class KPrompts:
 class CreateKapp:
     """
     A simple CLI tool for downloading and setting up project templates from GitHub.
-    
+
     Args:
         user (str): GitHub username.
         branch (str): Branch of the repository to download.
@@ -151,10 +152,10 @@ class CreateKapp:
     def set_path(self, path: str) -> str:
         """
         Sets the path where the project will be created.
-        
+
         Args:
             path (str): The folder path where the project will be set up.
-        
+
         Returns:
             str: The absolute path to the project folder.
         """
@@ -170,7 +171,7 @@ class CreateKapp:
     def download(self, url: str) -> None:
         """
         Downloads and extracts a project template from GitHub.
-        
+
         Args:
             url (str): The URL of the GitHub repository template.
         """
